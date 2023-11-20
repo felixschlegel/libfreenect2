@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
   size_t executable_name_idx = program_path.rfind("ProtonectSR");
 
   const std::string prog(argv[0]);
-  
+
   std::string binpath = "/";
 
   if(executable_name_idx != std::string::npos)
@@ -341,17 +341,17 @@ int main(int argc, char *argv[])
     std::vector<std::string> frame_filenames;
 
     d = opendir("recordings/depth");
-    
+
     if(!d)
     {
       std::cerr << "Could not open directory " << dir << " for replay." << std::endl;
       exit(1);
     }
-    
+
     while((dir = readdir(d)) != NULL)
     {
       std::string name = dir->d_name;
-      
+
       if(hasSuffix(name, ".depth"))
       {
         frame_filenames.push_back(name);
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
       }
     }
     // TODO: enable on merge
-/*    
+/*
     if(pipeline)
     {
 /// [open]
@@ -477,9 +477,9 @@ int main(int argc, char *argv[])
     {
       // TODO: add recording timestamp if max frame number reached
       // + avoid recording new ones
-      recorder.record(depth, "depth");
-      recorder.record(&registered, "registered");
-      // recorder.record(rgb,"rgb");
+      //recorder.record(depth, "depth");
+      //recorder.record(&registered, "registered");
+      recorder.record(rgb,"rgb");
 
       recorder.registTimeStamp();
     }

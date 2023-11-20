@@ -30,6 +30,7 @@
 
 Recorder::Recorder() : timeStamps(MAX_FRAME_ID)
 {
+    outPath = std::__fs::filesystem::current_path().generic_string() + "/recordings/";
 }
 
 // get initial time in ms
@@ -97,13 +98,22 @@ void Recorder::record(libfreenect2::Frame* frame, const std::string& frame_type)
   }
   else if (frame_type == "registered" || frame_type == "rgb")
   {
+    oss_recordPath << outPath;
+    if (!std::__fs::filesystem::exists(oss_recordPath.str()))
+          std::__fs::filesystem::create_directory(oss_recordPath.str());
+
+    oss_recordPath << "/rgb/";
+    if (!std::__fs::filesystem::exists(oss_recordPath.str()))
+          std::__fs::filesystem::create_directory(oss_recordPath.str());
+
     cvMat_frame = cv::Mat(frame->height, frame->width, CV_8UC4, frame->data);
     // TODO: handle relative path + check Windows / UNIX compat.
-    oss_recordPath << "../recordings/regist/" << std::setw( 5 ) << std::setfill( '0' ) << frameID << ".jpg";
+    oss_recordPath << std::setw( 5 ) << std::setfill( '0' ) << frameID << ".jpg";
     // std::cout << frame->height << ":" << frame->width << ":" << frame->bytes_per_pixel << std::endl;
   }
 
   recordPath = oss_recordPath.str();
+  std::cout << recordPath << std::endl;
 
   // SAVE IMAGE
   cv::imwrite(recordPath, cvMat_frame, img_comp_param); //write the image to file

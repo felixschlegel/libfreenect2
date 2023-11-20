@@ -71,6 +71,7 @@ private:
   int t_start;
   int t_now;
 
+  std::string outPath;
   std::ostringstream oss_recordPath;
   std::string recordPath;
   // -----------------
