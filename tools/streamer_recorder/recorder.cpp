@@ -89,25 +89,31 @@ void Recorder::initialize()
 
 void Recorder::record(libfreenect2::Frame* frame, const std::string& frame_type)
 {
+  oss_recordPath << outPath;
+  if (!std::__fs::filesystem::exists(oss_recordPath.str()))
+        std::__fs::filesystem::create_directory(oss_recordPath.str());
+
   if(frame_type == "depth")
   {
-    // std::cout << "Run Recorder." << std::endl;
-    cvMat_frame = cv::Mat(frame->height, frame->width, CV_32FC1, frame->data) / 10;
-    // TODO: handle relative path + check Windows / UNIX compat.
-    oss_recordPath << "../recordings/depth/" << std::setw( 5 ) << std::setfill( '0' ) << frameID << ".depth";
-  }
-  else if (frame_type == "registered" || frame_type == "rgb")
-  {
-    oss_recordPath << outPath;
+    oss_recordPath << "/depth/";
     if (!std::__fs::filesystem::exists(oss_recordPath.str()))
           std::__fs::filesystem::create_directory(oss_recordPath.str());
 
+    // Skip first and last line: https://github.com/OpenKinect/libfreenect2/issues/337#issuecomment-123647195
+    int bytesPerPixel = 4;
+    unsigned char * bighDepthData = frame->data + frame->width * bytesPerPixel;
+    int bigDepthHeight = frame->height - 2;
+    cvMat_frame = cv::Mat(bigDepthHeight, frame->width, CV_32FC1, bighDepthData) / 10;
+
+    oss_recordPath << std::setw( 5 ) << std::setfill( '0' ) << frameID << ".png";
+  }
+  else if (frame_type == "registered" || frame_type == "rgb")
+  {
     oss_recordPath << "/rgb/";
     if (!std::__fs::filesystem::exists(oss_recordPath.str()))
           std::__fs::filesystem::create_directory(oss_recordPath.str());
 
     cvMat_frame = cv::Mat(frame->height, frame->width, CV_8UC4, frame->data);
-    // TODO: handle relative path + check Windows / UNIX compat.
     oss_recordPath << std::setw( 5 ) << std::setfill( '0' ) << frameID << ".jpg";
     // std::cout << frame->height << ":" << frame->width << ":" << frame->bytes_per_pixel << std::endl;
   }

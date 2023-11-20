@@ -457,12 +457,15 @@ int main(int argc, char *argv[])
     libfreenect2::Frame *rgb = frames[libfreenect2::Frame::Color];
     libfreenect2::Frame *ir = frames[libfreenect2::Frame::Ir];
     libfreenect2::Frame *depth = frames[libfreenect2::Frame::Depth];
+    // height = 1082, bigdepth requires two extra lines: https://github.com/OpenKinect/libfreenect2/issues/337#issuecomment-123647195
+    // bytesPerPixel = 4 = sizeof(float) = value depth value in mm
+    libfreenect2::Frame bigdepth = libfreenect2::Frame(1920, 1082, 4);
 /// [loop start]
 
     if (enable_rgb && enable_depth)
     {
 /// [registration]
-      registration->apply(rgb, depth, &undistorted, &registered);
+      registration->apply(rgb, depth, &undistorted, &registered, true, &bigdepth, 0);
 /// [registration]
     }
 
@@ -477,7 +480,7 @@ int main(int argc, char *argv[])
     {
       // TODO: add recording timestamp if max frame number reached
       // + avoid recording new ones
-      //recorder.record(depth, "depth");
+      recorder.record(&bigdepth, "depth");
       //recorder.record(&registered, "registered");
       recorder.record(rgb,"rgb");
 
