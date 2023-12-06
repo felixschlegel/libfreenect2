@@ -105,6 +105,18 @@ void Recorder::record(libfreenect2::Frame* frame, const std::string& frame_type)
     int bigDepthHeight = frame->height - 2;
     cvMat_frame = cv::Mat(bigDepthHeight, frame->width, CV_32FC1, bighDepthData) / 10;
 
+    for (int i = 0; i < cvMat_frame.rows; ++i)
+    {
+      for (int j = 0; j < cvMat_frame.cols; ++j)
+      {
+        float value = cvMat_frame.at<float>(i, j);
+        if (std::isnan(value) || std::isinf(value))
+        {
+          cvMat_frame.at<float>(i, j) = 0.0f;
+        }
+      }
+    }
+
     oss_recordPath << std::setw( 5 ) << std::setfill( '0' ) << frameID << ".png";
   }
   else if (frame_type == "registered" || frame_type == "rgb")
